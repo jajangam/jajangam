@@ -66,6 +66,8 @@
       });
     }catch(e){}
     console.log("Firebase 데이터 동기화 완료");
+    // 동기화 완료 후 페이지 재렌더링 (Safari 포함 모든 브라우저)
+    if(typeof initPage === "function") initPage();
 
   } catch(e) {
     console.warn("Firebase 설정 필요:", e.message);
@@ -395,10 +397,8 @@ button{cursor:pointer;font-family:inherit;}
     </div>
     <span style="font-size:11px;color:var(--hint);" id="showcase-updated"></span>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;" id="showcase-grid">
-
-    <!-- JS가 채워줌 -->
-
+  <div class="showcase-grid" id="showcase-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted);font-size:13px;">채널 정보를 불러오는 중...</div>
   </div>
 
   <!-- ★ 공지란 (관리자 전용, admin.html에서 작성·관리) -->
@@ -512,7 +512,7 @@ button{cursor:pointer;font-family:inherit;}
       <h2 class="sec-title">오늘의 명상 가이드</h2>
       <p class="sec-desc">단계별로 따라하는 명상 루틴</p>
     </div>
-    <button class="btn-more">전체 프로그램 →</button>
+    <button class="btn-more" onclick="openSectionAll('med')">전체 프로그램 →</button>
   </div>
   <div class="g2" id="med-grid"></div>
 </div>
@@ -527,7 +527,7 @@ button{cursor:pointer;font-family:inherit;}
       <h2 class="sec-title">전국 유명 사찰 취재</h2>
       <p class="sec-desc">직접 찾아가 담은 사찰의 풍경, 역사, 그리고 사람들</p>
     </div>
-    <button class="btn-more">전체 사찰 →</button>
+    <button class="btn-more" onclick="openSectionAll('temple')">전체 사찰 →</button>
   </div>
   <div class="g4" id="temple-grid"></div>
 </div>
@@ -542,7 +542,7 @@ button{cursor:pointer;font-family:inherit;}
       <h2 class="sec-title">직접 먹어본 맛집 추천</h2>
       <p class="sec-desc">사찰 탐방 후 들르기 좋은 정직한 맛집들</p>
     </div>
-    <button class="btn-more">전체 맛집 →</button>
+    <button class="btn-more" onclick="openSectionAll('food')">전체 맛집 →</button>
   </div>
   <div class="g3">
     <div class="card"><div style="height:85px;background:var(--main-bg);display:flex;align-items:center;justify-content:center;font-size:32px">🍚</div><div style="padding:9px 12px"><div style="font-size:12px;font-weight:500;margin-bottom:2px">산채비빔밥 할머니집</div><div style="font-size:10px;color:var(--muted);margin-bottom:4px">월정사 인근 · 도보 5분</div><div class="stars"><span>★★★★★</span></div><div style="font-size:10px;color:var(--hint);margin-top:2px">1만원대 · 30년 전통</div></div></div>
@@ -561,7 +561,7 @@ button{cursor:pointer;font-family:inherit;}
       <h2 class="sec-title">사찰 주변의 멋진 사람들</h2>
       <p class="sec-desc">공예인 · 음악인 · 예술인 — 자신만의 길을 걷는 이들의 이야기</p>
     </div>
-    <button class="btn-more">전체 탐방기 →</button>
+    <button class="btn-more" onclick="openSectionAll('people')">전체 탐방기 →</button>
   </div>
   <div class="g2" id="people-grid"></div>
 </div>
@@ -666,7 +666,7 @@ button{cursor:pointer;font-family:inherit;}
       <h2 class="sec-title">출판사 굿즈 & 도서</h2>
       <p class="sec-desc">명상·여정·기억을 담은 정성스러운 물건들</p>
     </div>
-    <button class="btn-more">전체 상품 →</button>
+    <button class="btn-more" onclick="openSectionAll('goods')">전체 상품 →</button>
   </div>
   <div class="shop-layout">
     <div class="shop-main">
@@ -842,6 +842,75 @@ button{cursor:pointer;font-family:inherit;}
 .bcard .bfoot{display:flex;align-items:center;justify-content:space-between;}
 .bcard .bnick{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;}
 .bcard .bstats{display:flex;gap:8px;font-size:10px;color:var(--hint);}
+
+/* ══ 맨위로 버튼 ══ */
+#scroll-top-btn{
+  position:fixed;bottom:24px;right:20px;z-index:150;
+  width:42px;height:42px;border-radius:50%;
+  background:var(--main);color:#fff;border:none;
+  font-size:18px;cursor:pointer;
+  box-shadow:0 3px 12px rgba(0,0,0,.25);
+  display:none;align-items:center;justify-content:center;
+  transition:opacity .2s;
+}
+#scroll-top-btn:hover{background:var(--main-dark);}
+
+/* ══ 모바일 반응형 ══ */
+@media (max-width:768px){
+  .navbar{padding:0 1rem;height:54px;}
+  .nav-logo-name{font-size:15px;}
+  .nav-logo-domain{display:none;}
+  .nav-menu a{padding:4px 8px;font-size:11px;}
+  .nav-right button{font-size:11px;padding:5px 10px;}
+  .hero{padding:2rem 1rem;}
+  .hero-title{font-size:22px;}
+  .hero-sub{font-size:12px;}
+  .stat-row{gap:12px;}
+  .stat-n{font-size:20px;}
+  .section{padding:2rem 0;}
+  .container{padding:0 1rem;}
+  .sec-title{font-size:18px;}
+  .sec-head{flex-direction:column;align-items:flex-start;gap:8px;}
+  .g3,.g4{grid-template-columns:1fr 1fr!important;}
+  .card{border-radius:10px;}
+  .main-layout{flex-direction:column!important;}
+  .sidebar{width:100%!important;position:relative!important;height:auto!important;}
+  .goods-grid{grid-template-columns:1fr 1fr!important;}
+  .board-tabs{flex-wrap:wrap;gap:4px;}
+  .live-bar{padding:10px 1rem;flex-wrap:wrap;gap:6px;}
+}
+@media (max-width:480px){
+  .hero-title{font-size:18px;}
+  .g2,.g3,.g4{grid-template-columns:1fr!important;}
+  .goods-grid{grid-template-columns:1fr!important;}
+  .navbar{padding:0 .75rem;}
+  .nav-menu a{padding:3px 6px;font-size:10px;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+}
+
+/* ══ 5채널 쇼케이스 그리드 ══ */
+.showcase-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+}
+@media (max-width:1024px){
+  .showcase-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media (max-width:768px){
+  .showcase-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:480px){
+  .showcase-grid{grid-template-columns:1fr;}
+}
+
+/* ══ ch-hub 반응형 ══ */
+@media (max-width:768px){
+  .ch-hub{grid-template-columns:repeat(3,1fr)!important;padding:1rem;}
+}
+@media (max-width:480px){
+  .ch-hub{grid-template-columns:repeat(2,1fr)!important;padding:.75rem;}
+}
 </style>
 
 
@@ -1244,7 +1313,7 @@ function initPage(){
   renderDoksungSchedule();
   renderCafeMenu();
   renderGoodsGrid();
-  renderShowcase();
+  try{ renderShowcase(); }catch(e){ console.warn("showcase 오류:", e); }
   renderNotice();
   renderRecentVideos();
   renderMacCats();
@@ -1399,9 +1468,9 @@ function openBoardPost(idx,filter){
   var ytId='';
   if(p.ytUrl){var mm=p.ytUrl.match(/(?:v=|youtu.be\/|shorts\/|embed\/)([A-Za-z0-9_-]{11})/);if(mm)ytId=mm[1];}
   var imgs=p.images&&p.images.length?p.images:(p.imgData?[p.imgData]:[]);
-  var h='<div style="background:var(--card);position:fixed;inset:0;z-index:200;overflow-y:auto;">'
+  var h='<div id="notice-detail-overlay" style="background:var(--card);position:fixed;inset:0;z-index:200;overflow-y:auto;">'
     +'<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);">'
-    +'<button onclick="this.closest(\"[style*=fixed]\").remove()" style="background:none;border:none;font-size:18px;cursor:pointer;">&#8592;</button>'
+    +'<button onclick="var el=document.getElementById('notice-detail-overlay');if(el)el.remove();" style="background:none;border:none;font-size:18px;cursor:pointer;">&#8592;</button>'
     +'<div style="font-size:14px;font-weight:500;">'+p.title+'</div></div>';
   if(ytId)h+='<iframe src="https://www.youtube.com/embed/'+ytId+'" style="width:100%;height:220px;border:none;" allowfullscreen></iframe>';
   if(imgs.length){
@@ -1766,11 +1835,18 @@ function playFeatVideo(){
 //  5채널 쇼케이스 — 최신 데이터 동적 렌더
 // ═══════════════════════════════════════════
 function renderShowcase(){
-  const videos  = load('videos',   D_VIDEOS);
-  const goods   = load('goods',    D_GOODS);
-  const temples = load('temples',  D_TEMPLES);
-  const macVideos = load('macVideos', D_MAC_VIDEOS);
-  const board   = (function(){ try{ const v=localStorage.getItem('jajangam_board'); return v?JSON.parse(v):D_BOARD; }catch{ return D_BOARD; } })();
+  // 기본값 변수가 아직 선언 안 됐을 경우 대비
+  var _D_VIDEOS   = (typeof D_VIDEOS   !== 'undefined') ? D_VIDEOS   : [];
+  var _D_GOODS    = (typeof D_GOODS    !== 'undefined') ? D_GOODS    : [];
+  var _D_TEMPLES  = (typeof D_TEMPLES  !== 'undefined') ? D_TEMPLES  : [];
+  var _D_MAC_VIDEOS = (typeof D_MAC_VIDEOS !== 'undefined') ? D_MAC_VIDEOS : [];
+  var _D_BOARD    = (typeof D_BOARD    !== 'undefined') ? D_BOARD    : [];
+
+  const videos  = load('videos',   _D_VIDEOS);
+  const goods   = load('goods',    _D_GOODS);
+  const temples = load('temples',  _D_TEMPLES);
+  const macVideos = load('macVideos', _D_MAC_VIDEOS);
+  const board   = (function(){ try{ const v=localStorage.getItem('jajangam_board'); return v?JSON.parse(v):_D_BOARD; }catch{ return _D_BOARD; } })();
 
   const latestVideo   = videos[0]  || {};
   const latestGoods   = goods.filter(g=>!g.sold)[0] || {};
@@ -1831,6 +1907,7 @@ function renderShowcase(){
 
   const el = document.getElementById('showcase-grid');
   if(!el) return;
+  if(!cards || !cards.length){ el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted);">채널 데이터 없음</div>'; return; }
   el.innerHTML = cards.map(c=>`
     <div style="background:var(--card);border:2px solid ${c.border};border-radius:var(--rl);overflow:hidden;">
       <div style="background:${c.headBg};padding:10px 12px;display:flex;align-items:center;gap:7px;">
@@ -1980,9 +2057,9 @@ function openNoticeDetail(i){
   var ytId='';
   if(p.ytUrl){var mm=p.ytUrl.match(/(?:v=|youtu.be\/|shorts\/|embed\/)([A-Za-z0-9_-]{11})/);if(mm)ytId=mm[1];}
   var imgs=p.images&&p.images.length?p.images:[];
-  var h='<div style="background:var(--card);position:fixed;inset:0;z-index:200;overflow-y:auto;">'
+  var h='<div id="notice-detail-overlay" style="background:var(--card);position:fixed;inset:0;z-index:200;overflow-y:auto;">'
     +'<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);">'
-    +'<button onclick="this.closest(\"[style*=fixed]\").remove()" style="background:none;border:none;font-size:18px;cursor:pointer;">&#8592;</button>'
+    +'<button onclick="var el=document.getElementById('notice-detail-overlay');if(el)el.remove();" style="background:none;border:none;font-size:18px;cursor:pointer;">&#8592;</button>'
     +'<div style="font-size:14px;font-weight:500;">'+p.title+'</div></div>';
   if(ytId){
     h+='<iframe src="https://www.youtube.com/embed/'+ytId+'" style="width:100%;height:220px;border:none;" allowfullscreen></iframe>';
@@ -2123,6 +2200,82 @@ function renderRecentVideos(){
 
 // ── 공지 renderNotice는 위에 정의됨 ──
 
+
+// ── 전체보기 모달 (2번 수정) ─────────────────
+function openSectionAll(type){
+  var title = '';
+  var content = '';
+  if(type === 'med'){
+    title = '🌿 전체 명상 프로그램';
+    var meds = load('meds', D_MEDS);
+    content = meds.map(function(m){
+      return '<div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border);">'
+        +'<div style="width:32px;height:32px;border-radius:50%;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">'+(m.type==='morning'?'☀️':'🌙')+'</div>'
+        +'<div style="flex:1;">'
+        +'<div style="font-size:13px;font-weight:500;">'+m.name+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+m.desc+'</div>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--main);font-weight:500;">'+m.dur+'</div>'
+        +'</div>';
+    }).join('');
+  } else if(type === 'temple'){
+    title = '🏯 전체 사찰 탐방';
+    var temples = load('temples', D_TEMPLES);
+    var tagColors={강원:'b-teal',경남:'b-green',전남:'b-gold',경북:'b-purple'};
+    content = temples.map(function(t){
+      return '<div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border);">'
+        +'<div style="width:44px;height:44px;border-radius:10px;background:var(--main-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">'+(t.emoji||'🏯')+'</div>'
+        +'<div style="flex:1;">'
+        +'<div style="font-size:13px;font-weight:500;">'+t.name+' — '+t.sub+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">📍 '+t.loc+'</div>'
+        +'</div>'
+        +'<span class="badge '+(tagColors[t.region]||'b-teal')+'">'+t.region+'</span>'
+        +'</div>';
+    }).join('');
+  } else if(type === 'people'){
+    title = '👤 전체 문화인 탐방';
+    var people = load('people', D_PEOPLE);
+    content = people.map(function(p){
+      return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px;border-bottom:1px solid var(--border);">'
+        +'<div class="p-av" style="background:'+(p.avbg||'#FAEEDA')+';color:'+(p.avc||'#633806')+';flex-shrink:0;">'+( p.av||p.name[0])+'</div>'
+        +'<div>'
+        +'<div style="font-size:13px;font-weight:500;">'+p.name+'</div>'
+        +'<div style="font-size:11px;color:var(--main);margin-top:1px;">'+p.field+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6;">'+p.desc+'</div>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+  } else if(type === 'goods'){
+    title = '🛍️ 전체 굿즈';
+    var goods = load('goods', D_GOODS);
+    content = goods.map(function(g){
+      return '<div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border);">'
+        +'<div style="width:44px;height:44px;border-radius:10px;background:var(--gold-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🛍️</div>'
+        +'<div style="flex:1;">'
+        +'<div style="font-size:13px;font-weight:500;">'+g.name+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+g.desc+'</div>'
+        +'</div>'
+        +'<div style="font-size:13px;font-weight:600;color:var(--main);white-space:nowrap;">'+g.price.toLocaleString()+'원</div>'
+        +'</div>';
+    }).join('');
+  } else if(type === 'food'){
+    title = '🍜 전체 맛집';
+    content = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">맛집 정보가 준비 중입니다 🙏</div>';
+  }
+
+  if(!content) content = '<div style="padding:20px;text-align:center;color:var(--muted);">등록된 항목이 없습니다</div>';
+
+  var overlay = document.createElement('div');
+  overlay.id = 'section-all-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:var(--card);z-index:200;overflow-y:auto;';
+  overlay.innerHTML = '<div style="position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:10px;">'
+    +'<button onclick="document.getElementById('section-all-overlay').remove()" style="background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px;border-radius:6px;background:#f5f5f5;">&#8592; 돌아가기</button>'
+    +'<div style="font-size:15px;font-weight:600;">'+title+'</div>'
+    +'</div>'
+    +'<div>'+content+'</div>';
+  document.body.appendChild(overlay);
+}
+
 // 페이지 로드
 document.addEventListener('DOMContentLoaded', initPage);
 
@@ -2192,5 +2345,14 @@ function renderMindful(){}
     </div>
   </div>
 </div>
+
+<!-- 맨위로 버튼 -->
+<button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로">▲</button>
+<script>
+window.addEventListener('scroll', function(){
+  var btn = document.getElementById('scroll-top-btn');
+  if(btn) btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+});
+</script>
 </body>
 </html>
